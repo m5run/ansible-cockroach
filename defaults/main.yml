@@ -1,0 +1,7 @@
+---
+cockroach_user: cockroach
+cockroach_group: "{{ cockroach_user }}"
+cockroach_version: "v23.1.4"
+cockroach_join_addrs: "localhost"
+cockroach_systemd_template: "cockroach.service.j2"
+cockroach_sysconf_template: "sysconf.j2"

@@ -1,0 +1,18 @@
+---
+# handlers file for cockroach
+
+- name: restart cockroach
+  become: yes
+  service:
+    name: "{{ cockroach_service_name }}"
+    state: restarted
+  tags:
+    - cockroach
+
+- name: reload cockroach
+  become: yes
+  service:
+    name: "{{ cockroach_service_name }}"
+    state: reloaded
+  tags:
+    - cockroach

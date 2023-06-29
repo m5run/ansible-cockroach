@@ -1,0 +1,134 @@
+---
+# tasks file for cockroach
+
+- name: Include distribution specific variables
+  include_vars: "{{ ansible_distribution }}.yml"
+  tags:
+    - cockroach
+
+- include: CentOS.yml
+  when: ansible_distribution == "CentOS"
+  tags:
+    - cockroach
+
+- include: Ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+  tags:
+    - cockroach
+
+- name: Create cockroach group
+  become: yes
+  group:
+    name: "{{ cockroach_group }}"
+    system: true
+    gid: 800
+  tags:
+    - cockroach
+
+- name: Create cockroach user
+  become: yes
+  user:
+    name: "{{ cockroach_user }}"
+    system: true
+    uid: 800
+    group: "{{ cockroach_group }}"
+  tags:
+    - cockroach
+
+
+- name: Create directories
+  become: yes
+  file: 
+    path: "{{ cockroach_workdir }}/certs"
+    state: directory
+    user: "{{ cockroach_user }}"
+    group: "{{ cockroach_group }}"
+    mode: '0755'
+  tags:
+    - cockroach
+
+- name: Download cockroach package
+  become: yes
+  ansible.builtin.unarchive:
+    remote_src: yes
+    src: "{{ cockroach_url }}"
+    dest: "/tmp"
+  tags:
+    - cockroach
+
+- name: Copy cockroach binary 
+  become: yes
+  ansible.builtin.copy:
+    remote_src: true
+    src: "/tmp/{{ cockroach_distribution }}/cockroach"
+    dest: "/usr/local/bin/cockroach"
+    owner: "{{ cockroach_user }}"
+    group: "{{ cockroach_group }}"
+    mode: 0755
+  tags:
+    - cockroach
+  notify:
+    - restart cockroach
+
+- name: Copy ca cert
+  become: yes
+  ansible.builtin.copy: 
+    src: "{{ item }}"
+    dest: "{{ cockroach_workdir }}/certs/{{ item }}"
+    owner: "{{ cockroach_user }}"
+    group: "{{ cockroach_group }}"
+    mode: 0755
+  loop:
+    - ca.key
+    - ca.crt
+  tags:
+    - cockroach
+  notify:
+    - restart cockroach
+
+- name: Generate node certificate
+  become: true
+  become_user: "{{ cockroach_user }}"
+  command: "/usr/local/bin/cockroach cert create-node --certs-dir={{ cockroach_workdir }}/certs --ca-key={{ cockroach_workdir }}/certs/ca.key {{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }} localhost 127.0.0.1 {{ cockroach_lb | default('') }} {{ cockroach_lb_ip | default('')}}"
+  args:
+    chdir: "{{ cockroach_workdir }}"
+    creates: "{{ cockroach_workdir }}/certs/node.crt"
+  tags:
+    - cockroach
+  notify:
+    - restart cockroach
+
+- name: Create systemd unit files
+  become: yes
+  template:
+    src: "{{ cockroach_systemd_template }}"
+    dest: "/etc/systemd/system/cockroach.service"
+    owner: root
+    group: root
+    mode: 0744
+  tags:
+    - cockroach
+  notify:
+    - restart cockroach
+
+- name: Create sysconf file
+  become: yes
+  template:
+    src: "{{ cockroach_sysconf_template }}"
+    dest: "/etc/sysconfig/cockroach"
+    owner: root
+    group: root
+    mode: 0744
+  tags:
+    - cockroach
+  notify:
+    - restart cockroach
+    
+- name: Ensure cockroach service is started and enabled on boot
+  become: yes
+  service:
+    name: "{{ cockroach_service_name }}"
+    state: started
+    enabled: yes
+  tags:
+    - cockroach

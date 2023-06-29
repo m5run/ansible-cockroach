@@ -1,0 +1,19 @@
+[Unit]
+Description=Cockroach Database cluster node
+Requires=network.target
+
+[Service]
+Type=notify
+WorkingDirectory={{ cockroach_workdir }}
+EnfironmentFile=-/etc/sysconfig/cockroach
+ExecStart=/usr/local/bin/cockroach start --certs-dir=${COCKROACH_CERTS:-certs} --sql-addr=":5432" --advertise-addr={{ ansible_default_ipv4.address }}  --join=$COCKROACH_CLUSTER --locality=${COCKROACH_REGION:-region=local} --cache=.25 --max-sql-memory=.25
+TimeoutStopSec=300
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=cockroach
+User={{ cockroach_user }}
+
+[Install]
+WantedBy=default.target

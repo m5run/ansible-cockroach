@@ -1,0 +1,6 @@
+---
+
+cockroach_service_name: cockroach
+cockroach_distribution: "cockroach-{{ cockroach_version }}.linux-amd64"
+cockroach_url: "https://binaries.cockroachdb.com/{{ cockroach_distribution }}.tgz"
+cockroach_workdir: /var/lib/cockroach
