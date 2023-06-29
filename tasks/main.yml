@@ -130,5 +130,6 @@
     name: "{{ cockroach_service_name }}"
     state: started
     enabled: yes
+    daemon-reload: true
   tags:
     - cockroach

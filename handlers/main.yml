@@ -6,6 +6,7 @@
   service:
     name: "{{ cockroach_service_name }}"
     state: restarted
+    daemon-reload: true
   tags:
     - cockroach
 
@@ -16,3 +17,4 @@
     state: reloaded
   tags:
     - cockroach
+
