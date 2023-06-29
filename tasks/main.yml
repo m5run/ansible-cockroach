@@ -41,7 +41,7 @@
   file: 
     path: "{{ cockroach_workdir }}/certs"
     state: directory
-    user: "{{ cockroach_user }}"
+    owner: "{{ cockroach_user }}"
     group: "{{ cockroach_group }}"
     mode: '0755'
   tags:
