@@ -77,7 +77,7 @@
     dest: "{{ cockroach_workdir }}/certs/{{ item }}"
     owner: "{{ cockroach_user }}"
     group: "{{ cockroach_group }}"
-    mode: 0755
+    mode: 0644
   loop:
     - ca.key
     - ca.crt
@@ -105,7 +105,7 @@
     dest: "/etc/systemd/system/cockroach.service"
     owner: root
     group: root
-    mode: 0744
+    mode: 0644
   tags:
     - cockroach
   notify:
@@ -118,7 +118,7 @@
     dest: "/etc/sysconfig/cockroach"
     owner: root
     group: root
-    mode: 0744
+    mode: 0644
   tags:
     - cockroach
   notify:
