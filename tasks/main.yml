@@ -6,15 +6,15 @@
   tags:
     - cockroach
 
-- include: CentOS.yml
-  when: ansible_distribution == "CentOS"
-  tags:
-    - cockroach
+# - include: CentOS.yml
+#   when: ansible_distribution == "CentOS"
+#   tags:
+#     - cockroach
 
-- include: Ubuntu.yml
-  when: ansible_distribution == "Ubuntu"
-  tags:
-    - cockroach
+# - include: Ubuntu.yml
+#   when: ansible_distribution == "Ubuntu"
+#   tags:
+#     - cockroach
 
 - name: Create cockroach group
   become: yes
