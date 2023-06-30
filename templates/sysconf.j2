@@ -1,4 +1,8 @@
 COCKROACH_CERTS=certs
 COCKROACH_CLUSTER={{ cockroach_join_addrs }}
-COCKROACH_REGION="region={{ site }}"
+{%- set region = 'west' %}
+{%- if 'east' in regions %}
+{%- set region = 'east' %}
+{%- endif %}
+COCKROACH_REGION="region={{ region }},zone={{ site }}"
 COCKROACH_ADVERTISE={{ ansible_default_ipv4.address }}
