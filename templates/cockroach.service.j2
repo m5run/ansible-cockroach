@@ -5,8 +5,13 @@ Requires=network.target
 [Service]
 Type=notify
 WorkingDirectory={{ cockroach_workdir }}
+Environment=COCKROACH_CERTS=/var/lib/cockroach/certs
+Environment=COCKROACH_ADVERTISE=localhost
+Environment=COCKROACH_CLUSTER=localhost
+Environment=COCKROACH_SQL=:5432
+Environment=COCKROACH_REGION="region=local"
 EnvironmentFile=-/etc/sysconfig/cockroach
-ExecStart=/usr/local/bin/cockroach start --certs-dir $COCKROACH_CERTS --sql-addr=":5432" --advertise-addr={{ ansible_default_ipv4.address }}  --join $COCKROACH_CLUSTER --locality $COCKROACH_REGION --cache=.25 --max-sql-memory=.25
+ExecStart=/usr/local/bin/cockroach start --certs-dir $COCKROACH_CERTS --sql-addr "$COCKROACH_SQL" --advertise-addr "$COCKROACH_ADVERTISE"  --join "$COCKROACH_CLUSTER" --locality "$COCKROACH_REGION" --cache=.25 --max-sql-memory=.25
 TimeoutStopSec=300
 Restart=always
 RestartSec=10
